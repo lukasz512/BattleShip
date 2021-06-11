@@ -8,8 +8,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -52,33 +50,27 @@ public class MatchingPlayersActivity extends AppCompatActivity implements Serial
 
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, object,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            boolean isActive = response.getBoolean("active");
-                            String gameUuid = response.getString("uuid");
-                            if (isActive == true) {
-                                // go to game
-                                segueToMainActivity(response);
-                            } else {
-                                try {
-                                    Thread.sleep(6000);
-                                    retryEnterGame(gameUuid);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
+                response -> {
+                    try {
+                        boolean isActive = response.getBoolean("active");
+                        String gameUuid = response.getString("uuid");
+                        if (isActive) {
+                            // go to game
+                            segueToMainActivity(response);
+                        } else {
+                            try {
+                                Thread.sleep(6000);
+                                retryEnterGame(gameUuid);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
                             }
-                        } catch (Exception e) {
-                            e.printStackTrace();
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-                System.out.println("Error while creating board" + error.getMessage());
-            }
+                }, error -> {
+            error.printStackTrace();
+            System.out.println("Error while creating board" + error.getMessage());
         });
         requestQueue.add(jsonObjectRequest);
     }
@@ -88,42 +80,36 @@ public class MatchingPlayersActivity extends AppCompatActivity implements Serial
 
         RequestQueue queue = Volley.newRequestQueue(this);
         JsonObjectRequest stringRequest = new JsonObjectRequest(Request.Method.GET, url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            // get response data
-                            boolean isActive = response.getBoolean("active");
-                            String gameUuid = response.getString("uuid");
+                response -> {
+                    try {
+                        // get response data
+                        boolean isActive = response.getBoolean("active");
+                        String gameUuid1 = response.getString("uuid");
 
-                            if ((Boolean) isActive == true) {
-                                // start the game
-                                segueToMainActivity(response);
-                            } else {
-                                Toast.makeText(getBaseContext(), "Waiting for opponent", Toast.LENGTH_LONG).show();
-                                try {
-                                    Thread.sleep(6000);
-                                    retryEnterGame(gameUuid);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                    retryEnterGame(gameUuid);
-                                }
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            retryEnterGame(gameUuid);
+                        if ((Boolean) isActive) {
+                            // start the game
+                            segueToMainActivity(response);
+                        } else {
                             Toast.makeText(getBaseContext(), "Waiting for opponent", Toast.LENGTH_LONG).show();
+                            try {
+                                Thread.sleep(6000);
+                                retryEnterGame(gameUuid1);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                                retryEnterGame(gameUuid1);
+                            }
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        retryEnterGame(gameUuid);
+                        Toast.makeText(getBaseContext(), "Waiting for opponent", Toast.LENGTH_LONG).show();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                try {
-                    Thread.sleep(6000);
-                    retryEnterGame(gameUuid);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                }, error -> {
+            try {
+                Thread.sleep(6000);
+                retryEnterGame(gameUuid);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         });
         queue.add(stringRequest);

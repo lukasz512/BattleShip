@@ -76,59 +76,52 @@ public class PlaceShipsActivity extends AppCompatActivity {
     }
 
     public void setBoardDragListener(final BoardView boardView, final Board board) {
-        boardView.setOnDragListener(new View.OnDragListener() {
-            @Override
-            public boolean onDrag(View v, DragEvent event) {
-                switch (event.getAction()) {
-                    case DragEvent.ACTION_DROP:
-                        float x = event.getX();
-                        float y = event.getY();
-                        int width;
-                        int height;
+        boardView.setOnDragListener((v, event) -> {
+            if (event.getAction() == DragEvent.ACTION_DROP) {
+                float x = event.getX();
+                float y = event.getY();
+                int width;
+                int height;
 
-                        if (!shipBeingDragged.getShip().getDir()) {
-                            width = shipBeingDragged.getShipImage().getHeight();
-                            height = shipBeingDragged.getShipImage().getWidth();
+                if (!shipBeingDragged.getShip().getDir()) {
+                    width = shipBeingDragged.getShipImage().getHeight();
+                    height = shipBeingDragged.getShipImage().getWidth();
 
-                        } else {
-                            width = shipBeingDragged.getShipImage().getWidth();
-                            height = shipBeingDragged.getShipImage().getHeight();
-                        }
-
-                        //x and y coordinates of top-left of image, relative to the board
-                        float boardX = x - (width / 2);
-                        float boardY = y - (height / 2);
-
-                        int xy = boardView.locatePlace(boardX, boardY);
-                        if (xy == -1) {
-                            return true;
-                        }
-                        int xGrid = xy / 100;
-                        int yGrid = xy % 100;
-
-                        if (!board.placeShip(shipBeingDragged.getShip(), xGrid, yGrid, shipBeingDragged.getShip().getDir())) {
-                            return true;
-                        }
-
-                        if (!shipBeingDragged.getShip().getDir()) {
-                            shipBeingDragged.getShipImage().setX(v.getX() + (xGrid * (v.getWidth() / 10)) - (height / 2) + (width / 2));
-                            shipBeingDragged.getShipImage().setY(v.getY() + (yGrid * (v.getHeight() / 10)) + (height / 2) - (width / 2));
-
-                        } else {
-                            shipBeingDragged.getShipImage().setX(v.getX() + (xGrid * (v.getWidth() / 10)));
-                            shipBeingDragged.getShipImage().setY(v.getY() + (yGrid * (v.getHeight() / 10)));
-                        }
-
-                        boardView.invalidate();
-                        if (allShipsPlaced()) {
-                            enablePlaceButton(true);
-                        }
-                        break;
-                    default:
-                        break;
+                } else {
+                    width = shipBeingDragged.getShipImage().getWidth();
+                    height = shipBeingDragged.getShipImage().getHeight();
                 }
-                return true;
+
+                //x and y coordinates of top-left of image, relative to the board
+                float boardX = x - (width / 2);
+                float boardY = y - (height / 2);
+
+                int xy = boardView.locatePlace(boardX, boardY);
+                if (xy == -1) {
+                    return true;
+                }
+                int xGrid = xy / 100;
+                int yGrid = xy % 100;
+
+                if (!board.placeShip(shipBeingDragged.getShip(), xGrid, yGrid, shipBeingDragged.getShip().getDir())) {
+                    return true;
+                }
+
+                if (!shipBeingDragged.getShip().getDir()) {
+                    shipBeingDragged.getShipImage().setX(v.getX() + (xGrid * (v.getWidth() / 10)) - (height / 2) + (width / 2));
+                    shipBeingDragged.getShipImage().setY(v.getY() + (yGrid * (v.getHeight() / 10)) + (height / 2) - (width / 2));
+
+                } else {
+                    shipBeingDragged.getShipImage().setX(v.getX() + (xGrid * (v.getWidth() / 10)));
+                    shipBeingDragged.getShipImage().setY(v.getY() + (yGrid * (v.getHeight() / 10)));
+                }
+
+                boardView.invalidate();
+                if (allShipsPlaced()) {
+                    enablePlaceButton(true);
+                }
             }
+            return true;
         });
     }
 
@@ -203,6 +196,7 @@ public class PlaceShipsActivity extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
+        assert shipToRotate != null;
         shipToRotate.getShipImage().setX(width / 3 + 10);
         shipToRotate.getShipImage().setY((height / 4) - 20);
 
@@ -265,12 +259,7 @@ public class PlaceShipsActivity extends AppCompatActivity {
     private void setImageScaling(final ImageView image) {
         image.setAdjustViewBounds(true);
         ViewTreeObserver vto = image.getViewTreeObserver();
-        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                image.setMaxHeight(boardView.getMeasuredHeight() / 10);
-            }
-        });
+        vto.addOnGlobalLayoutListener(() -> image.setMaxHeight(boardView.getMeasuredHeight() / 10));
     }
 
     public void goToWaitingActivity(View view) {
