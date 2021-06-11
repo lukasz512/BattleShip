@@ -18,7 +18,6 @@ import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -275,7 +274,7 @@ public class PlaceShipsActivity extends AppCompatActivity {
     }
 
     public void goToWaitingActivity(View view) {
-        Intent intent = new Intent(PlaceShipsActivity.this, Waiting.class);
+        Intent intent = new Intent(PlaceShipsActivity.this, MatchingPlayersActivity.class);
         intent.putExtra("uuid", uuid);
         intent.putExtra("playerBoard", playerBoard);
         startActivity(intent);

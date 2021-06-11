@@ -7,7 +7,7 @@
     android:background="@drawable/background_game_lost"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".GameLost">
+    tools:context=".GameLostActivity">
 
     <TextView
         android:id="@+id/game_lost_label_title"

@@ -26,6 +26,10 @@ public class MainActivity extends AppCompatActivity {
     private BoardView playerBoardView;
     private BoardView opponentBoardView;
     private TextView whosTurn;
+    private TextView playerNameDisplay;
+    private TextView opponentNameDisplay;
+    private TextView playerPointDisplay;
+    private TextView opponentPointDisplay;
 
     Game game = new Game();
     Player player = new Player();
@@ -48,10 +52,17 @@ public class MainActivity extends AppCompatActivity {
         opponentBoardView = (BoardView) findViewById(R.id.opponentBoardView);
         playerBoardView = (BoardView) findViewById(R.id.playerBoardView);
         whosTurn = (TextView) findViewById(R.id.whosTurn);
+        playerNameDisplay = (TextView) findViewById(R.id.player1Name);
+        opponentNameDisplay = (TextView) findViewById(R.id.player2Name);
+        playerPointDisplay = (TextView) findViewById(R.id.player1Points);
+        opponentPointDisplay = (TextView) findViewById(R.id.player2Points);
+
 
         game = (Game) getIntent().getSerializableExtra("game");
         player = (Player) getIntent().getSerializableExtra("player");
         opponent = (Player) getIntent().getSerializableExtra("opponent");
+        playerNameDisplay.setText(player.getName());
+        opponentNameDisplay.setText(opponent.getName());
 
         playerBoard = Board.decipherPlaceShips(player.getBoard());
 //        opponentBoard = Board.decipherPlaceShips(opponent.getBoard());
@@ -74,7 +85,8 @@ public class MainActivity extends AppCompatActivity {
         opponentBoardView.setBoard(opponentBoard);
 
         playerBoardView.displayBoardsShips(true);
-        opponentBoardView.displayBoardsShips(true); //TODO REMOVE TO PREVENT CHEATING
+//      shows opponent board ships if given from server
+//      opponentBoardView.displayBoardsShips(true);
 
         opponentBoardView.addBoardTouchListener(new BoardView.BoardTouchListener() {
             @Override
@@ -92,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                     whosTurn.setText(player.getName());
                 } else {
                     whosTurn.setText(opponent.getName());
-                    isMyTurn();
+                    reciveShoot();
                 }
             }
         });
@@ -105,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
     public void placeShoot(Board board, int x, int y) {
         if (playerTurn()) {
 //            board.hit(board.placeAt(x, y)); //rysuje przed informacja zwrotna
-            postData(x, y);
+            sendShoot(x, y);
         } else {
             Toast.makeText(getBaseContext(), "Wait for your turn!", Toast.LENGTH_SHORT).show();
         }
@@ -123,11 +135,33 @@ public class MainActivity extends AppCompatActivity {
 //                updateTurnDisplay();
                 opponentBoardView.invalidate();
                 playerBoardView.invalidate();
+                playerPointDisplay.setText(player.getPoints());
+                opponentPointDisplay.setText(opponent.getPoints());
             }
         });
     }
 
-    public void postData(int x, int y) {
+    public void updatePoints(JSONObject response) {
+        try {
+            JSONObject player1 = response.getJSONObject("playerOne");
+            int player1Points = player1.getInt("playerOneFieldsRemainingCount");
+            int player2Points = player1.getInt("playerTwoFieldsRemainingCount");
+
+            String p1UUID = player1.getString("uuid");
+
+            if (p1UUID.equals(player.getUuid())) {
+                player.setPoints(player1Points);
+                opponent.setPoints(player2Points);
+            } else {
+                player.setPoints(player2Points);
+                opponent.setPoints(player1Points);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendShoot(int x, int y) {
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
         JSONObject object = new JSONObject();
         try {
@@ -145,8 +179,6 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         // check who's turn
 
-                        System.out.println("re" + response.toString());
-
                         // check if game over
                         if (response.has("winnerPlayer") && !response.isNull("winnerPlayer")) {
                             try {
@@ -163,6 +195,9 @@ public class MainActivity extends AppCompatActivity {
                                 JSONObject shootingPlayer = response.getJSONObject("shootingPlayer");
                                 String shootingUUID = shootingPlayer.getString("uuid");
                                 game.setShootingPlayer(shootingUUID);
+
+                                // show actual points
+                                updatePoints(response);
 
                                 // get shooting from opponent
                                 JSONObject lastShot = response.getJSONObject("lastShot");
@@ -183,10 +218,10 @@ public class MainActivity extends AppCompatActivity {
 
                                 // update display
                                 updateTurnDisplay();
+                                updatePoints(response);
                                 updateBoards();
 
-                                isMyTurn();
-                                System.out.println("strzelilem");
+                                reciveShoot();
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -209,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
         requestQueue.add(jsonObjectRequest);
     }
 
-    public void isMyTurn() {
+    public void reciveShoot() {
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
         String url = API_URL + "/matches/" + game.getGameUUID();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
@@ -252,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
                                     if (shotWasHit != 0) {
                                         Ship ship = Board.decodeShipType(shotWasHit);
                                         playerBoard.putShipHitPlace(x, y, ship);
-                                        if(shotWasSunk){
+                                        if (shotWasSunk) {
                                             playerBoard.setShipAsSunk(playerBoard, ship);
                                         }
                                     } else {
@@ -266,7 +301,7 @@ public class MainActivity extends AppCompatActivity {
                                     // loop for checking who's turn
                                     try {
                                         Thread.sleep(1000);
-                                        isMyTurn();
+                                        reciveShoot();
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }
@@ -293,9 +328,9 @@ public class MainActivity extends AppCompatActivity {
             // player wins
             Intent intentGO;
             if (winnerUUID.equals(player.getUuid())) {
-                intentGO = new Intent(MainActivity.this, GameWon.class);
+                intentGO = new Intent(MainActivity.this, GameWonActivity.class);
             } else {
-                intentGO = new Intent(MainActivity.this, GameLost.class);
+                intentGO = new Intent(MainActivity.this, GameLostActivity.class);
             }
             startActivity(intentGO);
         } catch (Exception e) {
@@ -317,17 +352,15 @@ public class MainActivity extends AppCompatActivity {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-
-                        System.out.println("rspo surrender " + response.toString());
                         Intent intLost;
-                        intLost = new Intent(MainActivity.this, GameLost.class);
+                        intLost = new Intent(MainActivity.this, GameLostActivity.class);
                         startActivity(intLost);
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Intent intLostErr;
-                intLostErr = new Intent(MainActivity.this, GameLost.class);
+                intLostErr = new Intent(MainActivity.this, GameLostActivity.class);
                 startActivity(intLostErr);
                 error.printStackTrace();
             }

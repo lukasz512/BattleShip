@@ -12,11 +12,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".GameLost"></activity>
-        <activity android:name=".GameWon" />
-        <activity android:name=".CreateUser" />
-        <activity android:name=".Waiting" />
-        <activity android:name=".MainMenu">
+        <activity android:name=".GameLostActivity"></activity>
+        <activity android:name=".GameWonActivity" />
+        <activity android:name=".CreateUserActivity" />
+        <activity android:name=".MatchingPlayersActivity" />
+        <activity android:name=".MainMenuActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

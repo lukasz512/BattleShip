@@ -21,7 +21,7 @@ import org.json.JSONObject;
 
 import static pl.edu.pw.ii.battleship.MainActivity.API_URL;
 
-public class CreateUser extends AppCompatActivity {
+public class CreateUserActivity extends AppCompatActivity {
     private EditText userName;
     private Button createUser;
 
@@ -57,7 +57,7 @@ public class CreateUser extends AppCompatActivity {
 
     public void CreateUser(String name, String url) {
 
-        Intent intent = new Intent(CreateUser.this, PlaceShipsActivity.class);
+        Intent intent = new Intent(CreateUserActivity.this, PlaceShipsActivity.class);
         // transfer user data to another activity
         startActivity(intent);
 
@@ -78,7 +78,7 @@ public class CreateUser extends AppCompatActivity {
                             // get user uuid
                             String uuid = response.getString("uuid");
                             // go to another activity
-                            Intent intent = new Intent(CreateUser.this, PlaceShipsActivity.class);
+                            Intent intent = new Intent(CreateUserActivity.this, PlaceShipsActivity.class);
                             // transfer user data to another activity
                             intent.putExtra("uuid", uuid);
                             startActivity(intent);

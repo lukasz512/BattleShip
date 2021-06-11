@@ -20,7 +20,7 @@ import java.io.Serializable;
 
 import static pl.edu.pw.ii.battleship.MainActivity.API_URL;
 
-public class Waiting extends AppCompatActivity implements Serializable {
+public class MatchingPlayersActivity extends AppCompatActivity implements Serializable {
     private Board playerBoard;
     private String uuid;
 
@@ -135,7 +135,7 @@ public class Waiting extends AppCompatActivity implements Serializable {
 
     public void segueToMainActivity(JSONObject response) {
         try {
-            Intent intent = new Intent(Waiting.this, MainActivity.class);
+            Intent intent = new Intent(MatchingPlayersActivity.this, MainActivity.class);
 
             // get response data
             JSONObject playerOne = response.getJSONObject("playerOne");
