@@ -21,21 +21,23 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_weight=".25"
+            android:baselineAligned="false"
             android:elevation="1dp"
-            android:orientation="horizontal"
-            android:baselineAligned="false">
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="96dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.4"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                tools:ignore="NestedWeights">
 
                 <pl.edu.pw.ii.battleship.BoardView
                     android:id="@+id/playerBoardView"
                     android:layout_width="200dp"
                     android:layout_height="0dp"
-                    android:layout_weight="0.30" />
+                    android:layout_weight="0.30"
+                    tools:ignore="NestedWeights" />
 
 
             </LinearLayout>
@@ -69,9 +71,9 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
+                    android:layout_height="0dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
-                    android:layout_height="0dp"
                     android:layout_weight="1"
                     android:orientation="horizontal">
 
@@ -79,8 +81,8 @@
                         android:id="@+id/player1Name"
                         android:layout_width="80dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/player1"
                         android:gravity="start"
+                        android:text="@string/player1"
                         android:textColor="@android:color/background_light" />
 
                     <TextView
@@ -105,8 +107,8 @@
                         android:id="@+id/player2Name"
                         android:layout_width="80dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/player1"
                         android:gravity="start"
+                        android:text="@string/player1"
                         android:textColor="@android:color/background_light" />
 
                     <TextView

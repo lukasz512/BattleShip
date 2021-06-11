@@ -7,11 +7,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,11 +28,10 @@ public class BoardView extends View {
         boardPaint.setColor(boardColor);
     }
 
-    private final int boardLineColor = Color.LTGRAY;
-
     private final Paint boardLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     {
+        int boardLineColor = Color.LTGRAY;
         boardLinePaint.setColor(boardLineColor);
         boardLinePaint.setStrokeWidth(2);
     }
@@ -91,7 +88,6 @@ public class BoardView extends View {
     }
 
     private void drawShips(Canvas canvas) {
-
         for (int x = 0; x < boardSize; x++) {
             for (int y = 0; y < boardSize; y++) {
                 if (board.placeAt(x, y).hasShip()) {
@@ -109,8 +105,6 @@ public class BoardView extends View {
         for (int x = 0; x < boardSize; x++) {
             for (int y = 0; y < boardSize; y++) {
                 if (board.placeAt(x, y).isHit()) {
-//                    drawSquare(canvas, Color.RED, x, y);
-//                    drawShipMiss(canvas, x, y);
                     drawHitPlace(canvas, x, y, "miss");
                 }
             }
@@ -119,7 +113,6 @@ public class BoardView extends View {
 
     public void drawSquare(Canvas canvas, int color, int x, int y) {
         boardPaint.setColor(color);
-        int length = 98;
         float viewSize = maxCoord();
         float tileSize = viewSize / 10;  //10 Is how many tiles there are
         float offSet = 8;
@@ -151,41 +144,13 @@ public class BoardView extends View {
         canvas.drawBitmap(crossed, (tileSize * x) + offSet, (tileSize * y) + offSet, boardPaint);
     }
 
-
-    public void drawShipHit(Canvas canvas, int x, int y) {
-        float viewSize = maxCoord();
-        float tileSize = viewSize / 10;  //10 Is how many tiles there are
-        float offSet = 8;
-
-        Bitmap b = BitmapFactory.decodeResource(getResources(), R.drawable.hit);
-        Bitmap crossed = Bitmap.createScaledBitmap(b, (int) (tileSize - 2 * offSet), (int) (tileSize - 2 * offSet), false);
-        crossed.setHasAlpha(false);
-        canvas.drawBitmap(crossed, (tileSize * x) + offSet, (tileSize * y) + offSet, boardPaint);
-    }
-
-    public void drawShipSunk(Canvas canvas, int x, int y) {
-        float viewSize = maxCoord();
-        float tileSize = viewSize / 10;  //10 Is how many tiles there are
-        float offSet = 8;
-
-//        canvas.drawRect((tileSize * x) + offSet, (tileSize * y) + offSet, ((tileSize * x) + tileSize) - offSet, (((viewSize / 10) * y) + tileSize) - offSet, boardPaint);
-
-        Bitmap b = BitmapFactory.decodeResource(getResources(), R.drawable.sunk);
-        Bitmap crossed = Bitmap.createScaledBitmap(b, (int) (tileSize - 2 * offSet), (int) (tileSize - 2 * offSet), false);
-        crossed.setHasAlpha(false);
-        canvas.drawBitmap(crossed, (tileSize * x) + offSet, (tileSize * y) + offSet, boardPaint);
-    }
-
     public void drawShipHitPlaces(Canvas canvas) {
         if (board == null) {
             return;
         }
         List<Place> shipHitPlaces = board.getShipHitPlaces();
         for (Place places : shipHitPlaces) {
-//            drawSquare(canvas, Color.MAGENTA, places.getX(), places.getY());
-//            drawShipHit(canvas, places.getX(), places.getY());
             drawHitPlace(canvas, places.getX(), places.getY(), "hit");
-
         }
     }
 
@@ -195,11 +160,8 @@ public class BoardView extends View {
         }
         List<Place> shipSunkPlaces = board.getShipSunkPlaces();
         for (Place places : shipSunkPlaces) {
-//            drawSquare(canvas, Color.BLACK, places.getX(), places.getY());
-//            drawShipSunk(canvas, places.getX(), places.getY());
             drawHitPlace(canvas, places.getX(), places.getY(), "sunk");
         }
-
     }
 
     private void drawGrid(Canvas canvas) {

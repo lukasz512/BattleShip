@@ -2,12 +2,12 @@ package pl.edu.pw.ii.battleship;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Board implements Serializable {
-    private final int size = 10;
-    private Place[][] board = null;
+    private final Place[][] board;
 
     public Board() {
         board = new Place[size()][size()];
@@ -30,7 +30,7 @@ public class Board implements Serializable {
 
         removeShip(ship);
 
-        List<Place> shipPlaces = new ArrayList<Place>();
+        List<Place> shipPlaces = new ArrayList<>();
         Place place;
 
         //Goes through places where ship will be placed.*/
@@ -63,10 +63,10 @@ public class Board implements Serializable {
     }
 
     private void removeShip(Ship ship) {
-        for (int i = 0; i < board.length; i++) {
+        for (Place[] places : board) {
             for (int j = 0; j < board[0].length; j++) {
-                if (board[i][j].hasShip(ship)) {
-                    board[i][j].removeShip();
+                if (places[j].hasShip(ship)) {
+                    places[j].removeShip();
                 }
             }
         }
@@ -90,19 +90,15 @@ public class Board implements Serializable {
 
     /**
      * Hits given place, returns true if was able to successfully hit the
-     *
-     * @param placeToHit place you want to hit
      */
-    boolean hit(Place placeToHit) {
+    void hit(Place placeToHit) {
         if (placeToHit == null) {
-            return false;
+            return;
         }
         //If place hasn't been hit before, then hits the place.
         if (!placeToHit.isHit()) {
             placeToHit.hit();
-            return true;
         }
-        return false;
     }
 
     boolean isOutOfBounds(int x, int y) {
@@ -110,14 +106,14 @@ public class Board implements Serializable {
     }
 
     int size() {
-        return size;
+        return 10;
     }
 
 
     List<Place> getShipHitPlaces() {
 
         List<Place> boardPlaces = getPlaces();
-        List<Place> shipHitPlaces = new ArrayList<Place>();
+        List<Place> shipHitPlaces = new ArrayList<>();
 
         for (Place place : boardPlaces) {
             if (place.isHit() && place.hasShip()) {
@@ -137,7 +133,7 @@ public class Board implements Serializable {
     List<Place> getShipSunkPlaces() {
 
         List<Place> boardPlaces = getPlaces();
-        List<Place> shipSunkPlaces = new ArrayList<Place>();
+        List<Place> shipSunkPlaces = new ArrayList<>();
 
         for (Place place : boardPlaces) {
             if (place.isHit() && place.hasShip() && place.isSunk()) {
@@ -157,18 +153,16 @@ public class Board implements Serializable {
     }
 
     private List<Place> getPlaces() {
-        List<Place> boardPlaces = new LinkedList<Place>();
+        List<Place> boardPlaces = new LinkedList<>();
         for (int i = 0; i < size(); i++) {
-            for (int j = 0; j < size(); j++) {
-                boardPlaces.add(board[i][j]);
-            }
+            boardPlaces.addAll(Arrays.asList(board[i]).subList(0, size()));
         }
         return boardPlaces;
     }
 
     @Override
     public String toString() {
-        String boardString = "";
+        StringBuilder boardString = new StringBuilder();
         if (board == null) {
             return "Board is null";
         }
@@ -180,24 +174,24 @@ public class Board implements Serializable {
                 if (ghost != null) {
                     String shipType = ghost.getName();
                     if (shipType.contains("aircraftcarrier"))
-                        boardString += "5";
+                        boardString.append("5");
                     else if (shipType.contains("battleship"))
-                        boardString += "4";
+                        boardString.append("4");
                     else if (shipType.contains("submarine"))
-                        boardString += "3";
+                        boardString.append("3");
                     else if (shipType.contains("frigate"))
-                        boardString += "2";
+                        boardString.append("2");
                     else //Sweeper
-                        boardString += "1";
+                        boardString.append("1");
                 }
                 //empty place
                 else {
-                    boardString += "0";
+                    boardString.append("0");
                 }
             }
         }
 
-        return boardString;
+        return boardString.toString();
     }
 
     static Board decipherPlaceShips(String opponentBoard) {
@@ -219,9 +213,6 @@ public class Board implements Serializable {
                     place.setShip(new Ship("frigate", 2));
                 else if (shipType == '1')
                     place.setShip(new Ship("minesweeper", 1));
-                else {
-                    //Don't set a ship
-                }
                 traverseString++;
             }
         }
