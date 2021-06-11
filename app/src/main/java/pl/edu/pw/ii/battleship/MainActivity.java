@@ -20,7 +20,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
-    public static final String API_URL = "http://d9d0a25a9926.ngrok.io";
+    public static final String API_URL = "http://c63040ba1119.ngrok.io";
 //    public static final String API_URL = "http://34.73.205.222:8080";
 
     private BoardView playerBoardView;
@@ -169,12 +169,14 @@ public class MainActivity extends AppCompatActivity {
                                 int x = lastShot.getInt("x");
                                 int y = lastShot.getInt("y");
                                 int shotWasHit = response.getInt("lastShotHit");
+                                boolean shotWasSunk = response.getBoolean("lastShotSunk");
+
 
                                 // place my shoot result
                                 if (shotWasHit != 0) {  //server sends 0 when miss
                                     Ship ship = Board.decodeShipType(shotWasHit);
                                     opponentBoard.putShipHitPlace(x, y, ship);
-
+                                    if(shotWasSunk) playerBoard.setShipAsSunk(playerBoard, ship);
                                 } else {
                                     opponentBoard.hit(opponentBoard.placeAt(x, y));
                                 }

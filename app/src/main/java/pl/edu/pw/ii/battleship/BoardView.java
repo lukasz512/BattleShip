@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -86,6 +87,7 @@ public class BoardView extends View {
             drawShips(canvas);
         }
         drawShipHitPlaces(canvas);
+        drawShipSunkPlaces(canvas);
     }
 
     private void drawShips(Canvas canvas) {
@@ -124,14 +126,18 @@ public class BoardView extends View {
 
     public void drawShipSunk(Canvas canvas, int x, int y) {
 //        int length = 98;
-//        float viewSize = maxCoord();
-//        float tileSize = viewSize / 10;  //10 Is how many tiles there are
-//        float offSet = 8;
+        float viewSize = maxCoord();
+        float tileSize = viewSize / 10;  //10 Is how many tiles there are
+        float offSet = 8;
+
 //        canvas.drawRect((tileSize * x) + offSet, (tileSize * y) + offSet, ((tileSize * x) + tileSize) - offSet, (((viewSize / 10) * y) + tileSize) - offSet, boardPaint);
         Paint p = new Paint();
-        p.setColor(Color.TRANSPARENT);
+//        p.setColor(Color.TRANSPARENT);
+
         Bitmap b = BitmapFactory.decodeResource(getResources(), R.drawable.sunk);
-        canvas.drawBitmap(b, 0, 0, p);
+        Bitmap crossed = Bitmap.createScaledBitmap(b, (int) (tileSize-2*offSet), (int) (tileSize-2*offSet), false);
+        crossed.setHasAlpha(true);
+        canvas.drawBitmap(crossed, (tileSize * x) + offSet, (tileSize * y) + offSet, boardPaint);
     }
 
     public void drawShipHitPlaces(Canvas canvas) {
@@ -140,7 +146,7 @@ public class BoardView extends View {
         }
         List<Place> shipHitPlaces = board.getShipHitPlaces();
         for (Place places : shipHitPlaces) {
-            drawSquare(canvas, Color.GREEN, places.getX(), places.getY());
+            drawSquare(canvas, Color.MAGENTA, places.getX(), places.getY());
         }
 
     }

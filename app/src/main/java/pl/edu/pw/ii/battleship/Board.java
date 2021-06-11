@@ -151,7 +151,7 @@ public class Board implements Serializable {
         for (int i = 0; i < b.size(); i++) {
             for (int j = 0; j < b.size(); j++) {
                 Place place = board[i][j];
-                place.setSunk(place.getShip().equals(ship));
+                if (place.getShip() != null && !place.isSunk()) place.setSunk(place.getShip().equals(ship));
             }
         }
     }
