@@ -179,22 +179,23 @@ public class MainActivity extends AppCompatActivity {
      * @param  response vertical value of a Place, where Shoot was made
      */
     public void updatePoints(JSONObject response) {
+        System.out.println("points"+ response);
         try {
             JSONObject player1 = response.getJSONObject("playerOne");
-            int player1Points = player1.getInt("playerOneFieldsRemainingCount");
-            int player2Points = player1.getInt("playerTwoFieldsRemainingCount");
+            int player1Points = response.getInt("playerOneFieldsRemainingCount");
+            int player2Points = response.getInt("playerTwoFieldsRemainingCount");
 
             String p1UUID = player1.getString("uuid");
 
             if (p1UUID.equals(player.getUuid())) {
-                player.setPoints(player1Points);
-                opponent.setPoints(player2Points);
-            } else {
                 player.setPoints(player2Points);
                 opponent.setPoints(player1Points);
+            } else {
+                player.setPoints(player1Points);
+                opponent.setPoints(player2Points);
             }
-            playerPointDisplay.setText(player.getPoints());
-            opponentPointDisplay.setText(opponent.getPoints());
+            playerPointDisplay.setText(String.valueOf(player.getPoints()));
+            opponentPointDisplay.setText(String.valueOf(opponent.getPoints()));
         } catch (JSONException e) {
             e.printStackTrace();
         }

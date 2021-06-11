@@ -62,8 +62,8 @@ class Player implements Serializable {
         return points;
     }
 
-    public void setPoints(int pointsFromServer) {
+    public void setPoints(int points) {
         //
-        this.points = -1 * pointsFromServer + 17;
+        this.points = -1 * points + 17;
     }
 }

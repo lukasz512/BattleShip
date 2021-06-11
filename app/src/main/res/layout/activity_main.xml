@@ -46,7 +46,6 @@
                 android:layout_weight="0.6"
                 android:orientation="vertical">
 
-
                 <Button
                     android:id="@+id/surrender"
                     style="@style/Widget.AppCompat.Button.Colored"
