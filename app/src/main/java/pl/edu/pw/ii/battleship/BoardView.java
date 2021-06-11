@@ -131,6 +131,18 @@ public class BoardView extends View {
 
     }
 
+    public void drawShipSunkPlaces(Canvas canvas) {
+        if (board == null) {
+            return;
+        }
+        List<Place> shipSunkPlaces = board.getShipSunkPlaces();
+        for (Place places : shipSunkPlaces) {
+            drawSquare(canvas, Color.BLACK, places.getX(), places.getY());
+
+        }
+
+    }
+
     private void drawGrid(Canvas canvas) {
         final float maxCoord = maxCoord();
         final float placeSize = lineGap();

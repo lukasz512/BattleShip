@@ -127,11 +127,33 @@ public class Board implements Serializable {
         return shipHitPlaces;
     }
 
-    void putShipHitPlace(int x, int y){
+    void putShipHitPlace(int x, int y, Ship ship){
         Place place = board[y][x];
         place.hit();
-        place.setShip(new Ship("ship", 9));
+        place.setShip(ship);
         board[y][x] = place;
+    }
+
+    List<Place> getShipSunkPlaces() {
+
+        List<Place> boardPlaces = getPlaces();
+        List<Place> shipSunkPlaces = new ArrayList<Place>();
+
+        for (Place place : boardPlaces) {
+            if (place.isHit() && place.hasShip() && place.isSunk()) {
+                shipSunkPlaces.add(place);
+            }
+        }
+        return shipSunkPlaces;
+    }
+
+    void setShipAsSunk(Board b, Ship ship){
+        for (int i = 0; i < b.size(); i++) {
+            for (int j = 0; j < b.size(); j++) {
+                Place place = board[i][j];
+                place.setSunk(place.getShip().equals(ship));
+            }
+        }
     }
 
     private List<Place> getPlaces() {
@@ -204,5 +226,21 @@ public class Board implements Serializable {
             }
         }
         return b;
+    }
+
+    static Ship decodeShipType(int shipType){
+        if (shipType == 5)
+            return new Ship("aircraftcarrier", 5);
+        else if (shipType == 4)
+            return new Ship("battleship", 4);
+        else if (shipType == 3)
+            return new Ship("submarine", 3);
+        else if (shipType == 2)
+            return new Ship("frigate", 2);
+        else if (shipType == 1)
+            return new Ship("minesweeper", 1);
+        else {
+           return null;
+        }
     }
 }

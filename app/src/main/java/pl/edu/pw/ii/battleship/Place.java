@@ -9,6 +9,7 @@ public class Place implements Serializable {
     /**Place can have 1 ship, if it doesn't have a ship then it is null*/
     private Ship ship = null;
 
+    private boolean isSunk;
     /**Initializes place with x and y coordinates
      * @param x is the x-coordinate of place, 0-based index
      * @param y is the y-coordinate of place, 0-based index*/
@@ -61,4 +62,11 @@ public class Place implements Serializable {
         return ship;
     }
 
+    public boolean isSunk() {
+        return isSunk;
+    }
+
+    public void setSunk(boolean bool){
+        this.isSunk = bool;
+    }
 }

@@ -20,7 +20,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
-    public static final String API_URL = "http://349935eb09b6.ngrok.io";
+    public static final String API_URL = "http://d9d0a25a9926.ngrok.io";
 //    public static final String API_URL = "http://34.73.205.222:8080";
 
     private BoardView playerBoardView;
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                     whosTurn.setText(player.getName());
                 } else {
                     whosTurn.setText(opponent.getName());
-                    reciveShoot();
+                    isMyTurn();
                 }
             }
         });
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
     public void placeShoot(Board board, int x, int y) {
         if (playerTurn()) {
 //            board.hit(board.placeAt(x, y)); //rysuje przed informacja zwrotna
-            sendShoot(x, y);
+            postData(x, y);
         } else {
             Toast.makeText(getBaseContext(), "Wait for your turn!", Toast.LENGTH_SHORT).show();
         }
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void sendShoot(int x, int y) {
+    public void postData(int x, int y) {
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
         JSONObject object = new JSONObject();
         try {
@@ -144,34 +144,50 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         // check who's turn
-                        try {
-                            System.out.println("re" + response.toString());
 
-                            JSONObject shootingPlayer = response.getJSONObject("shootingPlayer");
-                            String shootingUUID = shootingPlayer.getString("uuid");
-                            game.setShootingPlayer(shootingUUID);
+                        System.out.println("re" + response.toString());
 
-                            // get shooting from opponent
-                            JSONObject lastShot = response.getJSONObject("lastShot");
-                            int x = lastShot.getInt("x");
-                            int y = lastShot.getInt("y");
-                            boolean shotWasHit = response.getBoolean("lastShotHit");
-
-                            // place my shoot result
-                            if (shotWasHit) {
-                                opponentBoard.putShipHitPlace(x, y);
-                            } else{
-                                opponentBoard.hit(opponentBoard.placeAt(x, y));
+                        // check if game over
+                        if (response.has("winnerPlayer") && !response.isNull("winnerPlayer")) {
+                            try {
+                                JSONObject winnerPlayer = response.getJSONObject("winnerPlayer");
+                                if (winnerPlayer != null) {
+                                    gameOver(winnerPlayer);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                // continue the game
                             }
+                        } else {
+                            try {
+                                JSONObject shootingPlayer = response.getJSONObject("shootingPlayer");
+                                String shootingUUID = shootingPlayer.getString("uuid");
+                                game.setShootingPlayer(shootingUUID);
 
-                            // update display
-                            updateTurnDisplay();
-                            updateBoards();
+                                // get shooting from opponent
+                                JSONObject lastShot = response.getJSONObject("lastShot");
+                                int x = lastShot.getInt("x");
+                                int y = lastShot.getInt("y");
+                                int shotWasHit = response.getInt("lastShotHit");
 
-                            reciveShoot();
-                            System.out.println("strzelilem");
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                                // place my shoot result
+                                if (shotWasHit != 0) {  //server sends 0 when miss
+                                    Ship ship = Board.decodeShipType(shotWasHit);
+                                    opponentBoard.putShipHitPlace(x, y, ship);
+
+                                } else {
+                                    opponentBoard.hit(opponentBoard.placeAt(x, y));
+                                }
+
+                                // update display
+                                updateTurnDisplay();
+                                updateBoards();
+
+                                isMyTurn();
+                                System.out.println("strzelilem");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -191,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
         requestQueue.add(jsonObjectRequest);
     }
 
-    public void reciveShoot() {
+    public void isMyTurn() {
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
         String url = API_URL + "/matches/" + game.getGameUUID();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
@@ -210,48 +226,53 @@ public class MainActivity extends AppCompatActivity {
                                 e.printStackTrace();
                                 // continue the game
                             }
-                        }
+                        } else {
 
+                            System.out.println("resp strzal" + response.toString());
 
-                        System.out.println("resp strzal" + response.toString());
+                            // check if players turn
+                            try {
+                                JSONObject shootingPlayer = response.getJSONObject("shootingPlayer");
+                                String shootingUUID = shootingPlayer.getString("uuid");
 
-                        // check if players turn
-                        try {
-                            JSONObject shootingPlayer = response.getJSONObject("shootingPlayer");
-                            String shootingUUID = shootingPlayer.getString("uuid");
+                                // get shooting from opponent
+                                JSONObject lastShot = response.getJSONObject("lastShot");
+                                int x = lastShot.getInt("x");
+                                int y = lastShot.getInt("y");
+                                int shotWasHit = response.getInt("lastShotHit");
+                                boolean shotWasSunk = response.getBoolean("lastShotSunk");
 
-                            // get shooting from opponent
-                            JSONObject lastShot = response.getJSONObject("lastShot");
-                            int x = lastShot.getInt("x");
-                            int y = lastShot.getInt("y");
-                            boolean shotWasHit = response.getBoolean("lastShotHit");
+                                // x = -1 => game just started
+                                if (shootingUUID.equals(player.getUuid()) && x != -1 && y != -1) {
+                                    // set my turn
+                                    game.setShootingPlayer(shootingUUID);
+                                    // place shoot from opponent
+                                    if (shotWasHit != 0) {
+                                        Ship ship = Board.decodeShipType(shotWasHit);
+                                        playerBoard.putShipHitPlace(x, y, ship);
+                                        if(shotWasSunk){
+                                            playerBoard.setShipAsSunk(playerBoard, ship);
+                                        }
+                                    } else {
+                                        playerBoard.hit(playerBoard.placeAt(x, y));
+                                    }
 
-                            // x = -1 => game just started
-                            if (shootingUUID.equals(player.getUuid()) && x != -1 && y != -1 ) {
-                                // set my turn
-                                game.setShootingPlayer(shootingUUID);
-                                // place shoot from opponent
-                                if (shotWasHit) {
-                                    playerBoard.putShipHitPlace(x, y);
-                                } else{
-                                    playerBoard.hit(playerBoard.placeAt(x, y));
+                                    updateTurnDisplay();
+                                    updateBoards();
+                                } else {
+                                    // opponent turn - wait for shoot
+                                    // loop for checking who's turn
+                                    try {
+                                        Thread.sleep(1000);
+                                        isMyTurn();
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+
                                 }
-
-                                updateTurnDisplay();
-                                updateBoards();
-                            } else {
-                                // opponent turn - wait for shoot
-                                // loop for checking who's turn
-                                try {
-                                    Thread.sleep(500);
-                                    reciveShoot();
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
                     }
                 }, new Response.ErrorListener() {
