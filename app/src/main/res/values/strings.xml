@@ -1,29 +1,10 @@
 <resources>
     <string name="app_name">Battleship</string>
     <string name="main_menu_label">Main Menu</string>
-    <string name="title_activity_place_ships">PlaceShipsActivity</string>
-    <string name="smart_opponent">Smart Opponent</string>
-    <string name="random_opponent">Random Opponent</string>
-    <string name="wifi_p2p_opponent">Wifi Direct Opponent</string>
-    <string name="opponent_select">Select Opponent</string>
-    <string name="reset_game_title">Reset game</string>
-    <string name="reset_game_prompt">Are you sure you want to restart the current game?</string>
-    <string name="reset_game_request_prompt">Request to other player to start a new game?</string>
-    <string name="reset_game_connected_prompt">Other player requested to play new game, accept request?</string>
     <string name="place_ships">Place ships</string>
-    <string name="waiting">Waiting for others to join...</string>
-    <string name="strategy">Random Opponent</string>
+    <string name="waiting">Waiting for others to join…</string>
     <string name="rotate_ship">ROTATE</string>
-    <string name="winner_title">Winner!</string>
-    <string name="loser_title">Loser!</string>
-    <string name="winner_description">You have beaten the game by sinking all of the ships!</string>
-    <string name="loser_description">You have lost the game, your opponent sank all your ships before you did.</string>
     <string name="player_turn_status">It is your turn </string>
-    <string name="computer_turn_status">It it computer\'s turn </string>
-    <string name="opponent_turn_status">It it opponent\'s turn </string>
-    <string name="win_status">You have won the game! </string>
-    <string name="lose_status">You have lost the game! </string>
-    <string name="title_activity_connection">ConnectionActivity</string>
     <string name="aircraftcarrier">Aircraft Carrier</string>
     <string name="submarine">Submarine</string>
     <string name="frigate">Frigate</string>
@@ -38,6 +19,10 @@
     <string name="go_back_to_main_menu_and_try_again">Go back to main menu and try again.</string>
     <string name="go_back_to_main_menu_and_play_again">go back to main menu and play again.</string>
     <string name="you_won">You won!</string>
-
+    <string name="surrender">Surrender</string>
+    <string name="points">POINTS:</string>
+    <string name="player1">Player1</string>
+    <string name="_0">0</string>
+    <string name="who_s_turn">WHO\'S TURN:</string>
 
 </resources>

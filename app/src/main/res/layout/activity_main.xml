@@ -12,10 +12,10 @@
     tools:context="MainActivity">
 
     <LinearLayout
-        android:paddingTop="55dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingTop="55dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -40,36 +40,87 @@
             </LinearLayout>
 
             <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.6"
-                android:orientation="vertical"
-                android:layout_width="0dp">
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/app_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:text="@string/app_name"
-                    android:textAlignment="center"
-                    android:textColor="@android:color/background_light" />
 
                 <Button
-                    android:id="@+id/resetGame"
+                    android:id="@+id/surrender"
                     style="@style/Widget.AppCompat.Button.Colored"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
+                    android:layout_marginBottom="10dp"
                     android:background="@android:color/holo_blue_dark"
-                    android:onClick="resetGame"
-                    android:text="@string/main_menu_label"
+                    android:onClick="surrender"
+                    android:text="@string/surrender"
                     android:theme="@style/AppTheme" />
+
+                <TextView
+                    android:id="@+id/pointsLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:text="@string/points"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/background_light" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/player1Name"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/player1"
+                        android:textAlignment="center"
+                        android:textColor="@android:color/background_light" />
+
+                    <TextView
+                        android:id="@+id/player1Points"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="right"
+                        android:text="@string/_0"
+                        android:textColor="@android:color/background_light" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="3"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/player2Name"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/player1"
+                        android:textAlignment="center"
+                        android:textColor="@android:color/background_light" />
+
+                    <TextView
+                        android:id="@+id/player2Points"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="right"
+                        android:text="@string/_0"
+                        android:textColor="@android:color/background_light" />
+
+                </LinearLayout>
+
                 <TextView
                     android:id="@+id/whosTurnLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:text="@string/who_s_turn"
                     android:textAlignment="center"
-                    android:text="@string/strategy"
                     android:textColor="@android:color/background_light" />
 
                 <TextView
@@ -79,7 +130,6 @@
                     android:text="@string/player_turn_status"
                     android:textAlignment="center"
                     android:textColor="@android:color/background_light" />
-
 
 
             </LinearLayout>
