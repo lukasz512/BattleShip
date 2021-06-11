@@ -154,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void placeShoot(Board board, int x, int y) {
         if (playerTurn()) {
-//            board.hit(board.placeAt(x, y)); //rysuje przed informacja zwrotna
             sendShoot(x, y);
         } else {
             Toast.makeText(getBaseContext(), "Wait for your turn!", Toast.LENGTH_SHORT).show();
@@ -165,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Updates the board's displays
+     *
      */
     public void updateBoards() {
         runOnUiThread(() -> {
@@ -173,6 +173,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Updates Players Points value
+     *
+     * @param  response vertical value of a Place, where Shoot was made
+     */
     public void updatePoints(JSONObject response) {
         try {
             JSONObject player1 = response.getJSONObject("playerOne");
@@ -195,8 +200,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Sends coordinates of shoot to the server
+     *
+     * @param  x vertical value of a Place, where Shoot was made
+     * @param  y horizontal value of a Place, where Shoot was made
+     */
     public void sendShoot(int x, int y) {
+        // Create RequestQueue object
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+        // creates empty object for
         JSONObject object = new JSONObject();
         try {
             object.put("player-uuid", player.getUuid());
@@ -209,8 +222,6 @@ public class MainActivity extends AppCompatActivity {
         String url = API_URL + "/matches/" + game.getGameUUID() + "/shoot";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, object,
                 response -> {
-                    // check who's turn
-
                     // check if game over
                     if (response.has("winnerPlayer") && !response.isNull("winnerPlayer")) {
                         try {
@@ -222,6 +233,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     } else {
                         try {
+                            // get winner user
                             JSONObject shootingPlayer = response.getJSONObject("shootingPlayer");
                             String shootingUUID = shootingPlayer.getString("uuid");
                             game.setShootingPlayer(shootingUUID);
@@ -233,21 +245,21 @@ public class MainActivity extends AppCompatActivity {
                             int shotWasHit = response.getInt("lastShotHit");
                             boolean shotWasSunk = response.getBoolean("lastShotSunk");
 
-
                             // place my shoot result
                             if (shotWasHit != 0) {  //server sends 0 when miss
                                 Ship ship = Board.decodeShipType(shotWasHit);
                                 opponentBoard.putShipHitPlace(x1, y1, ship);
-                                if(shotWasSunk) playerBoard.setShipAsSunk(playerBoard, ship);
+                                if(shotWasSunk) opponentBoard.setShipAsSunk(opponentBoard, ship);
                             } else {
                                 opponentBoard.hit(opponentBoard.placeAt(x1, y1));
                             }
 
-                            // update display
+                            // update which Player is shooting
                             updateTurnDisplay();
 //                                updatePoints(response);
+                            // update Players' Boards
                             updateBoards();
-
+                            // start listening for shoot from Opponent
                             reciveShoot();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -262,6 +274,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
+        // starts request
         requestQueue.add(jsonObjectRequest);
     }
 
