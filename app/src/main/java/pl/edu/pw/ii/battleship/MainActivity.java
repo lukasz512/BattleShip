@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * API address for comunication in BattleShipAplication
      */
-    public static final String API_URL = "http://c63040ba1119.ngrok.io";
+    public static final String API_URL = "http://c561c377ba33.ngrok.io";
 //    public static final String API_URL = "http://34.73.205.222:8080";
 
     /**

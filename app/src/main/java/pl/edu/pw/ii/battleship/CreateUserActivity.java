@@ -57,10 +57,6 @@ public class CreateUserActivity extends AppCompatActivity {
 
     public void CreateUser(String name, String url) {
 
-        Intent intent = new Intent(CreateUserActivity.this, PlaceShipsActivity.class);
-        // transfer user data to another activity
-        startActivity(intent);
-
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
 
         JSONObject object = new JSONObject();
