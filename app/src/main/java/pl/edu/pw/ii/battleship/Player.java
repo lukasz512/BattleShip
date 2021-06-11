@@ -6,6 +6,7 @@ class Player implements Serializable {
     private String uuid;
     private String name;
     private String board;
+    private int points = 0;
 
     /**
      * Returns UUID of Player
@@ -55,5 +56,14 @@ class Player implements Serializable {
 
     public void setBoard(String board) {
         this.board = board;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int pointsFromServer) {
+        //
+        this.points = -1 * pointsFromServer + 17;
     }
 }

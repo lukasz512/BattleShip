@@ -1,6 +1,8 @@
 package pl.edu.pw.ii.battleship;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -120,6 +122,18 @@ public class BoardView extends View {
         canvas.drawRect((tileSize * x) + offSet, (tileSize * y) + offSet, ((tileSize * x) + tileSize) - offSet, (((viewSize / 10) * y) + tileSize) - offSet, boardPaint);
     }
 
+    public void drawShipSunk(Canvas canvas, int x, int y) {
+//        int length = 98;
+//        float viewSize = maxCoord();
+//        float tileSize = viewSize / 10;  //10 Is how many tiles there are
+//        float offSet = 8;
+//        canvas.drawRect((tileSize * x) + offSet, (tileSize * y) + offSet, ((tileSize * x) + tileSize) - offSet, (((viewSize / 10) * y) + tileSize) - offSet, boardPaint);
+        Paint p = new Paint();
+        p.setColor(Color.TRANSPARENT);
+        Bitmap b = BitmapFactory.decodeResource(getResources(), R.drawable.sunk);
+        canvas.drawBitmap(b, 0, 0, p);
+    }
+
     public void drawShipHitPlaces(Canvas canvas) {
         if (board == null) {
             return;
@@ -137,8 +151,8 @@ public class BoardView extends View {
         }
         List<Place> shipSunkPlaces = board.getShipSunkPlaces();
         for (Place places : shipSunkPlaces) {
-            drawSquare(canvas, Color.BLACK, places.getX(), places.getY());
-
+//            drawSquare(canvas, Color.BLACK, places.getX(), places.getY());
+            drawShipSunk(canvas, places.getX(), places.getY());
         }
 
     }
