@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/black"
     android:orientation="vertical"
-    tools:context="Waiting">
+    tools:context=".MatchingPlayersActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

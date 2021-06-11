@@ -7,7 +7,7 @@
     android:background="@drawable/background_create_user"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".CreateUser">
+    tools:context=".CreateUserActivity">
 
     <TextView
         android:id="@+id/app_title"

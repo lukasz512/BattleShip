@@ -7,7 +7,7 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class GameWon extends AppCompatActivity {
+public class GameWonActivity extends AppCompatActivity {
     Button mainMenuBtn;
 
     @Override
@@ -23,7 +23,7 @@ public class GameWon extends AppCompatActivity {
         mainMenuBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(GameWon.this, MainMenu.class));
+                startActivity(new Intent(GameWonActivity.this, MainMenuActivity.class));
             }
         });
     }

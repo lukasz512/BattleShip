@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-public class MainMenu extends Activity {
+public class MainMenuActivity extends Activity {
     Button newGame;
 
     @Override
@@ -21,7 +21,7 @@ public class MainMenu extends Activity {
         newGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainMenu.this, CreateUser.class));
+                startActivity(new Intent(MainMenuActivity.this, CreateUserActivity.class));
             }
         });
     }
