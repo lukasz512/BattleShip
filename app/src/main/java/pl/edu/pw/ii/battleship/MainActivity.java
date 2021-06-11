@@ -19,25 +19,66 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * Created by Lukasz Ostrowski & Cezary Klos.
+ */
 public class MainActivity extends AppCompatActivity {
+    /**
+     * API address for comunication in BattleShipAplication
+     */
     public static final String API_URL = "http://c63040ba1119.ngrok.io";
 //    public static final String API_URL = "http://34.73.205.222:8080";
 
+    /**
+     * The view of the Board, main player's board view
+     */
     private BoardView playerBoardView;
+
+    /**
+     * The view of the opponent's Board
+     */
     private BoardView opponentBoardView;
+
+    /**
+     * TextView that says who's turn it is now
+     */
     private TextView whosTurn;
-    private TextView playerNameDisplay;
-    private TextView opponentNameDisplay;
+
+    /**
+     * TextView that shows number of shoots collected by Main Player
+     */
     private TextView playerPointDisplay;
+
+    /**
+     * TextView that shows number of shoots collected by Opponent
+     */
     private TextView opponentPointDisplay;
 
+    /**
+     * Contains the game data: UUID, and who's turn
+     */
     Game game = new Game();
+
+    /**
+     * Creates main Player object
+     */
     Player player = new Player();
+
+    /**
+     * Creates Opponent player object
+     */
     Player opponent = new Player();
 
+    /**
+     * Contains Player Board sent from server
+     */
     Board playerBoard;
     Board opponentBoard;
 
+    /**
+     * Empty Board for Opponent
+     */
+//    Board opponentBoard = new Board();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +93,13 @@ public class MainActivity extends AppCompatActivity {
         opponentBoardView = (BoardView) findViewById(R.id.opponentBoardView);
         playerBoardView = (BoardView) findViewById(R.id.playerBoardView);
         whosTurn = (TextView) findViewById(R.id.whosTurn);
-        playerNameDisplay = (TextView) findViewById(R.id.player1Name);
-        opponentNameDisplay = (TextView) findViewById(R.id.player2Name);
+
+
+        // TextView for displaying main Player Name
+        TextView playerNameDisplay = (TextView) findViewById(R.id.player1Name);
+
+        // TextView for displaying Opponent Name
+        TextView opponentNameDisplay = (TextView) findViewById(R.id.player2Name);
         playerPointDisplay = (TextView) findViewById(R.id.player1Points);
         opponentPointDisplay = (TextView) findViewById(R.id.player2Points);
 
@@ -88,24 +134,16 @@ public class MainActivity extends AppCompatActivity {
 //      shows opponent board ships if given from server
 //      opponentBoardView.displayBoardsShips(true);
 
-        opponentBoardView.addBoardTouchListener(new BoardView.BoardTouchListener() {
-            @Override
-            public void onTouch(int x, int y) {
-                placeShoot(opponentBoard, x, y);
-            }
-        });
+        opponentBoardView.addBoardTouchListener((x, y) -> placeShoot(opponentBoard, x, y));
     }
 
     public void updateTurnDisplay() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (playerTurn()) {
-                    whosTurn.setText(player.getName());
-                } else {
-                    whosTurn.setText(opponent.getName());
-                    reciveShoot();
-                }
+        runOnUiThread(() -> {
+            if (playerTurn()) {
+                whosTurn.setText(player.getName());
+            } else {
+                whosTurn.setText(opponent.getName());
+                reciveShoot();
             }
         });
     }
@@ -129,15 +167,9 @@ public class MainActivity extends AppCompatActivity {
      * Updates the board's displays
      */
     public void updateBoards() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-//                updateTurnDisplay();
-                opponentBoardView.invalidate();
-                playerBoardView.invalidate();
-//                playerPointDisplay.setText(player.getPoints());
-//                opponentPointDisplay.setText(opponent.getPoints());
-            }
+        runOnUiThread(() -> {
+            opponentBoardView.invalidate();
+            playerBoardView.invalidate();
         });
     }
 
@@ -156,6 +188,8 @@ public class MainActivity extends AppCompatActivity {
                 player.setPoints(player2Points);
                 opponent.setPoints(player1Points);
             }
+            playerPointDisplay.setText(player.getPoints());
+            opponentPointDisplay.setText(opponent.getPoints());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -174,73 +208,60 @@ public class MainActivity extends AppCompatActivity {
 
         String url = API_URL + "/matches/" + game.getGameUUID() + "/shoot";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, object,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        // check who's turn
+                response -> {
+                    // check who's turn
 
-                        // check if game over
-                        if (response.has("winnerPlayer") && !response.isNull("winnerPlayer")) {
-                            try {
-                                JSONObject winnerPlayer = response.getJSONObject("winnerPlayer");
-                                if (winnerPlayer != null) {
-                                    gameOver(winnerPlayer);
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                // continue the game
+                    // check if game over
+                    if (response.has("winnerPlayer") && !response.isNull("winnerPlayer")) {
+                        try {
+                            JSONObject winnerPlayer = response.getJSONObject("winnerPlayer");
+                            gameOver(winnerPlayer);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            // continue the game
+                        }
+                    } else {
+                        try {
+                            JSONObject shootingPlayer = response.getJSONObject("shootingPlayer");
+                            String shootingUUID = shootingPlayer.getString("uuid");
+                            game.setShootingPlayer(shootingUUID);
+
+                            // get shooting from opponent
+                            JSONObject lastShot = response.getJSONObject("lastShot");
+                            int x1 = lastShot.getInt("x");
+                            int y1 = lastShot.getInt("y");
+                            int shotWasHit = response.getInt("lastShotHit");
+                            boolean shotWasSunk = response.getBoolean("lastShotSunk");
+
+
+                            // place my shoot result
+                            if (shotWasHit != 0) {  //server sends 0 when miss
+                                Ship ship = Board.decodeShipType(shotWasHit);
+                                opponentBoard.putShipHitPlace(x1, y1, ship);
+                                if(shotWasSunk) playerBoard.setShipAsSunk(playerBoard, ship);
+                            } else {
+                                opponentBoard.hit(opponentBoard.placeAt(x1, y1));
                             }
-                        } else {
-                            try {
-                                JSONObject shootingPlayer = response.getJSONObject("shootingPlayer");
-                                String shootingUUID = shootingPlayer.getString("uuid");
-                                game.setShootingPlayer(shootingUUID);
 
-                                // show actual points
+                            // update display
+                            updateTurnDisplay();
 //                                updatePoints(response);
+                            updateBoards();
 
-                                // get shooting from opponent
-                                JSONObject lastShot = response.getJSONObject("lastShot");
-                                int x = lastShot.getInt("x");
-                                int y = lastShot.getInt("y");
-                                int shotWasHit = response.getInt("lastShotHit");
-                                boolean shotWasSunk = response.getBoolean("lastShotSunk");
-
-
-                                // place my shoot result
-                                if (shotWasHit != 0) {  //server sends 0 when miss
-                                    Ship ship = Board.decodeShipType(shotWasHit);
-                                    opponentBoard.putShipHitPlace(x, y, ship);
-                                    if(shotWasSunk) opponentBoard.setShipAsSunk(opponentBoard, ship);
-                                } else {
-                                    opponentBoard.hit(opponentBoard.placeAt(x, y));
-                                }
-
-                                // update display
-                                updateTurnDisplay();
-//                                updatePoints(response);
-                                updateBoards();
-
-                                reciveShoot();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                            reciveShoot();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                NetworkResponse response = error.networkResponse;
-                if (response != null && response.data != null) {
-                    switch (response.statusCode) {
+                }, error -> {
+                    NetworkResponse response = error.networkResponse;
+                    if (response != null && response.data != null) {
                         // place was shoot already
-                        case 400:
+                        if (response.statusCode == 400) {
                             Toast.makeText(getBaseContext(), "Choose another place to shoot!", Toast.LENGTH_SHORT).show();
-                            break;
+                        }
                     }
-                }
-            }
-        });
+                });
         requestQueue.add(jsonObjectRequest);
     }
 
@@ -248,76 +269,62 @@ public class MainActivity extends AppCompatActivity {
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
         String url = API_URL + "/matches/" + game.getGameUUID();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
+                response -> {
+                    // check if game over
+                    if (response.has("winnerPlayer") && !response.isNull("winnerPlayer")) {
+                        try {
+                            JSONObject winnerPlayer = response.getJSONObject("winnerPlayer");
+                            gameOver(winnerPlayer);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            // continue the game
+                        }
+                    } else {
+                        // check if players turn
+                        try {
+                            JSONObject shootingPlayer = response.getJSONObject("shootingPlayer");
+                            String shootingUUID = shootingPlayer.getString("uuid");
 
-                        // check if game over
-                        if (response.has("winnerPlayer") && !response.isNull("winnerPlayer")) {
-                            try {
-                                JSONObject winnerPlayer = response.getJSONObject("winnerPlayer");
-                                if (winnerPlayer != null) {
-                                    gameOver(winnerPlayer);
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                // continue the game
-                            }
-                        } else {
+                            // get shooting from opponent
+                            JSONObject lastShot = response.getJSONObject("lastShot");
+                            int x = lastShot.getInt("x");
+                            int y = lastShot.getInt("y");
+                            int shotWasHit = response.getInt("lastShotHit");
+                            boolean shotWasSunk = response.getBoolean("lastShotSunk");
 
-                            System.out.println("resp strzal" + response.toString());
-
-                            // check if players turn
-                            try {
-                                JSONObject shootingPlayer = response.getJSONObject("shootingPlayer");
-                                String shootingUUID = shootingPlayer.getString("uuid");
-
-                                // get shooting from opponent
-                                JSONObject lastShot = response.getJSONObject("lastShot");
-                                int x = lastShot.getInt("x");
-                                int y = lastShot.getInt("y");
-                                int shotWasHit = response.getInt("lastShotHit");
-                                boolean shotWasSunk = response.getBoolean("lastShotSunk");
-
-                                // x = -1 => game just started
-                                if (shootingUUID.equals(player.getUuid()) && x != -1 && y != -1) {
-                                    // set my turn
-                                    game.setShootingPlayer(shootingUUID);
-                                    // place shoot from opponent
-                                    if (shotWasHit != 0) {
-                                        Ship ship = Board.decodeShipType(shotWasHit);
-                                        playerBoard.putShipHitPlace(x, y, ship);
-                                        if (shotWasSunk) {
-                                            playerBoard.setShipAsSunk(playerBoard, ship);
-                                        }
-                                    } else {
-                                        playerBoard.hit(playerBoard.placeAt(x, y));
+                            // x = -1 => game just started
+                            if (shootingUUID.equals(player.getUuid()) && x != -1 && y != -1) {
+                                // set my turn
+                                game.setShootingPlayer(shootingUUID);
+                                // place shoot from opponent
+                                if (shotWasHit != 0) {
+                                    Ship ship = Board.decodeShipType(shotWasHit);
+                                    playerBoard.putShipHitPlace(x, y, ship);
+                                    if (shotWasSunk) {
+                                        playerBoard.setShipAsSunk(playerBoard, ship);
                                     }
-
-                                    updateTurnDisplay();
-                                    updateBoards();
                                 } else {
-                                    // opponent turn - wait for shoot
-                                    // loop for checking who's turn
-                                    try {
-                                        Thread.sleep(1000);
-                                        reciveShoot();
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-
+                                    playerBoard.hit(playerBoard.placeAt(x, y));
                                 }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+
+                                updateTurnDisplay();
+                                updateBoards();
+                            } else {
+                                // opponent turn - wait for shoot
+                                // loop for checking who's turn
+                                try {
+                                    Thread.sleep(1000);
+                                    reciveShoot();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+
                             }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-            }
-        });
+                }, Throwable::printStackTrace);
         requestQueue.add(jsonObjectRequest);
     }
 
@@ -349,22 +356,16 @@ public class MainActivity extends AppCompatActivity {
 
         String url = API_URL + "/matches/" + game.getGameUUID() + "/surrender";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, object,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Intent intLost;
-                        intLost = new Intent(MainActivity.this, GameLostActivity.class);
-                        startActivity(intLost);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Intent intLostErr;
-                intLostErr = new Intent(MainActivity.this, GameLostActivity.class);
-                startActivity(intLostErr);
-                error.printStackTrace();
-            }
-        });
+                response -> {
+                    Intent intLost;
+                    intLost = new Intent(MainActivity.this, GameLostActivity.class);
+                    startActivity(intLost);
+                }, error -> {
+                    Intent intLostErr;
+                    intLostErr = new Intent(MainActivity.this, GameLostActivity.class);
+                    startActivity(intLostErr);
+                    error.printStackTrace();
+                });
         requestQueue.add(jsonObjectRequest);
     }
 }
