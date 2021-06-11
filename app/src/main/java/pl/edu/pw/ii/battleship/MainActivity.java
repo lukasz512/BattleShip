@@ -256,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
 
                             // update which Player is shooting
                             updateTurnDisplay();
-//                                updatePoints(response);
+                            updatePoints(response);
                             // update Players' Boards
                             updateBoards();
                             // start listening for shoot from Opponent
@@ -321,6 +321,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
 
                                 updateTurnDisplay();
+                                updatePoints(response);
                                 updateBoards();
                             } else {
                                 // opponent turn - wait for shoot

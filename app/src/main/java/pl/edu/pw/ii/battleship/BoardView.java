@@ -1,5 +1,6 @@
 package pl.edu.pw.ii.battleship;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -65,15 +66,14 @@ public class BoardView extends View {
 
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_UP:
-                int xy = locatePlace(event.getX(), event.getY());
-                if (xy >= 0) {
-                    notifyBoardTouch(xy / 100, xy % 100);
-                }
-                break;
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            int xy = locatePlace(event.getX(), event.getY());
+            if (xy >= 0) {
+                notifyBoardTouch(xy / 100, xy % 100);
+            }
         }
         return true;
     }
@@ -109,7 +109,9 @@ public class BoardView extends View {
         for (int x = 0; x < boardSize; x++) {
             for (int y = 0; y < boardSize; y++) {
                 if (board.placeAt(x, y).isHit()) {
-                    drawSquare(canvas, Color.RED, x, y);
+//                    drawSquare(canvas, Color.RED, x, y);
+//                    drawShipMiss(canvas, x, y);
+                    drawHitPlace(canvas, x, y, "miss");
                 }
             }
         }
@@ -124,19 +126,53 @@ public class BoardView extends View {
         canvas.drawRect((tileSize * x) + offSet, (tileSize * y) + offSet, ((tileSize * x) + tileSize) - offSet, (((viewSize / 10) * y) + tileSize) - offSet, boardPaint);
     }
 
+    public void drawHitPlace(Canvas canvas, int x, int y, String type) {
+        Bitmap b;
+        switch (type) {
+            case "miss":
+                b = BitmapFactory.decodeResource(getResources(), R.drawable.miss);
+                break;
+            case "hit":
+                b = BitmapFactory.decodeResource(getResources(), R.drawable.hit);
+                break;
+            case "sunk":
+                b = BitmapFactory.decodeResource(getResources(), R.drawable.sunk);
+                break;
+            default:
+                return;
+        }
+
+        float viewSize = maxCoord();
+        float tileSize = viewSize / 10;  //10 Is how many tiles there are
+        float offSet = 8;
+
+        Bitmap crossed = Bitmap.createScaledBitmap(b, (int) (tileSize - 2 * offSet), (int) (tileSize - 2 * offSet), false);
+        crossed.setHasAlpha(false);
+        canvas.drawBitmap(crossed, (tileSize * x) + offSet, (tileSize * y) + offSet, boardPaint);
+    }
+
+
+    public void drawShipHit(Canvas canvas, int x, int y) {
+        float viewSize = maxCoord();
+        float tileSize = viewSize / 10;  //10 Is how many tiles there are
+        float offSet = 8;
+
+        Bitmap b = BitmapFactory.decodeResource(getResources(), R.drawable.hit);
+        Bitmap crossed = Bitmap.createScaledBitmap(b, (int) (tileSize - 2 * offSet), (int) (tileSize - 2 * offSet), false);
+        crossed.setHasAlpha(false);
+        canvas.drawBitmap(crossed, (tileSize * x) + offSet, (tileSize * y) + offSet, boardPaint);
+    }
+
     public void drawShipSunk(Canvas canvas, int x, int y) {
-//        int length = 98;
         float viewSize = maxCoord();
         float tileSize = viewSize / 10;  //10 Is how many tiles there are
         float offSet = 8;
 
 //        canvas.drawRect((tileSize * x) + offSet, (tileSize * y) + offSet, ((tileSize * x) + tileSize) - offSet, (((viewSize / 10) * y) + tileSize) - offSet, boardPaint);
-        Paint p = new Paint();
-//        p.setColor(Color.TRANSPARENT);
 
         Bitmap b = BitmapFactory.decodeResource(getResources(), R.drawable.sunk);
-        Bitmap crossed = Bitmap.createScaledBitmap(b, (int) (tileSize-2*offSet), (int) (tileSize-2*offSet), false);
-        crossed.setHasAlpha(true);
+        Bitmap crossed = Bitmap.createScaledBitmap(b, (int) (tileSize - 2 * offSet), (int) (tileSize - 2 * offSet), false);
+        crossed.setHasAlpha(false);
         canvas.drawBitmap(crossed, (tileSize * x) + offSet, (tileSize * y) + offSet, boardPaint);
     }
 
@@ -146,9 +182,11 @@ public class BoardView extends View {
         }
         List<Place> shipHitPlaces = board.getShipHitPlaces();
         for (Place places : shipHitPlaces) {
-            drawSquare(canvas, Color.MAGENTA, places.getX(), places.getY());
-        }
+//            drawSquare(canvas, Color.MAGENTA, places.getX(), places.getY());
+//            drawShipHit(canvas, places.getX(), places.getY());
+            drawHitPlace(canvas, places.getX(), places.getY(), "hit");
 
+        }
     }
 
     public void drawShipSunkPlaces(Canvas canvas) {
@@ -158,7 +196,8 @@ public class BoardView extends View {
         List<Place> shipSunkPlaces = board.getShipSunkPlaces();
         for (Place places : shipSunkPlaces) {
 //            drawSquare(canvas, Color.BLACK, places.getX(), places.getY());
-            drawShipSunk(canvas, places.getX(), places.getY());
+//            drawShipSunk(canvas, places.getX(), places.getY());
+            drawHitPlace(canvas, places.getX(), places.getY(), "sunk");
         }
 
     }
