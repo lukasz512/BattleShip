@@ -32,7 +32,7 @@
         android:layout_height="463dp" />
 
     <Button
-        android:id="@+id/mainMenuBtn"
+        android:id="@+id/mainMenu"
         android:layout_width="300dp"
         android:layout_height="70dp"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
