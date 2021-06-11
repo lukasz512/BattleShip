@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                     whosTurn.setText(player.getName());
                 } else {
                     whosTurn.setText(opponent.getName());
-                    isMyTurn();
+                    reciveShoot();
                 }
             }
         });
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
     public void placeShoot(Board board, int x, int y) {
         if (playerTurn()) {
 //            board.hit(board.placeAt(x, y)); //rysuje przed informacja zwrotna
-            postData(x, y);
+            sendShoot(x, y);
         } else {
             Toast.makeText(getBaseContext(), "Wait for your turn!", Toast.LENGTH_SHORT).show();
         }
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void postData(int x, int y) {
+    public void sendShoot(int x, int y) {
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
         JSONObject object = new JSONObject();
         try {
@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
                             updateTurnDisplay();
                             updateBoards();
 
-                            isMyTurn();
+                            reciveShoot();
                             System.out.println("strzelilem");
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -191,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
         requestQueue.add(jsonObjectRequest);
     }
 
-    public void isMyTurn() {
+    public void reciveShoot() {
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
         String url = API_URL + "/matches/" + game.getGameUUID();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
@@ -244,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
                                 // loop for checking who's turn
                                 try {
                                     Thread.sleep(500);
-                                    isMyTurn();
+                                    reciveShoot();
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
