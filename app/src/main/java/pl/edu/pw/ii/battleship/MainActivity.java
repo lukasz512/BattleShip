@@ -135,8 +135,8 @@ public class MainActivity extends AppCompatActivity {
 //                updateTurnDisplay();
                 opponentBoardView.invalidate();
                 playerBoardView.invalidate();
-                playerPointDisplay.setText(player.getPoints());
-                opponentPointDisplay.setText(opponent.getPoints());
+//                playerPointDisplay.setText(player.getPoints());
+//                opponentPointDisplay.setText(opponent.getPoints());
             }
         });
     }
@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
                                 game.setShootingPlayer(shootingUUID);
 
                                 // show actual points
-                                updatePoints(response);
+//                                updatePoints(response);
 
                                 // get shooting from opponent
                                 JSONObject lastShot = response.getJSONObject("lastShot");
@@ -211,14 +211,14 @@ public class MainActivity extends AppCompatActivity {
                                 if (shotWasHit != 0) {  //server sends 0 when miss
                                     Ship ship = Board.decodeShipType(shotWasHit);
                                     opponentBoard.putShipHitPlace(x, y, ship);
-                                    if(shotWasSunk) playerBoard.setShipAsSunk(playerBoard, ship);
+                                    if(shotWasSunk) opponentBoard.setShipAsSunk(opponentBoard, ship);
                                 } else {
                                     opponentBoard.hit(opponentBoard.placeAt(x, y));
                                 }
 
                                 // update display
                                 updateTurnDisplay();
-                                updatePoints(response);
+//                                updatePoints(response);
                                 updateBoards();
 
                                 reciveShoot();
