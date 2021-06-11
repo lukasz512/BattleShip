@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_create_user"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".CreateUser">
+
+    <TextView
+        android:id="@+id/app_title"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="@string/enter_user_name"
+        android:textAlignment="center"
+        android:textColor="@android:color/background_light"
+        android:textSize="20sp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="403dp" />
+
+    <EditText
+        android:id="@+id/userName"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="50dp"
+        android:autofillHints="@string/enter_name"
+        android:ems="10"
+        android:hint="@string/enter_name"
+        android:inputType="textPersonName"
+        android:textColor="@android:color/background_light"
+        android:textColorHint="@android:color/holo_blue_light" />
+
+    <Button
+        android:id="@+id/createUser"
+        android:layout_width="300dp"
+        android:layout_height="70dp"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:background="@android:color/holo_blue_dark"
+        android:text="@string/create_user"
+        android:textColor="@android:color/background_light" />
+
+
+</LinearLayout>

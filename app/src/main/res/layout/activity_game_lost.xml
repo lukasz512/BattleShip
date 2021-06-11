@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_game_lost"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".GameLost">
+
+    <TextView
+        android:id="@+id/game_lost_label_title"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="@string/you_lost"
+        android:textAlignment="center"
+        android:textColor="@android:color/background_light"
+        android:textSize="40sp" />
+
+    <TextView
+        android:id="@+id/game_lost_label_subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="@string/go_back_to_main_menu_and_try_again"
+        android:textAlignment="center"
+        android:textColor="@android:color/background_light"
+        android:textSize="20sp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="463dp" />
+
+    <Button
+        android:id="@+id/mainMenu"
+        android:layout_width="300dp"
+        android:layout_height="70dp"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:background="@android:color/holo_blue_dark"
+        android:text="@string/go_to_main_menu"
+        android:textColor="@android:color/background_light" />
+
+
+</LinearLayout>
