@@ -137,18 +137,9 @@ public class MatchingPlayersActivity extends AppCompatActivity implements Serial
             String boardP2 = response.getString("playerTwoShips");
             String b2 = handleStringConcatenation(boardP2);
 
-            // create user 1
-            Player player1 = new Player();
-            Player player2 = new Player();
-
-            player1.setName(nameP1);
-            player1.setUuid(uuidP1);
-            player1.setBoard(b1);
-
-            // create user 2
-            player2.setName(nameP2);
-            player2.setUuid(uuidP2);
-            player2.setBoard(b2);
+            // create players
+            Player player1 = new Player(nameP1, uuidP1, b1);
+            Player player2 = new Player(nameP2, uuidP2, b2);
 
             // save players
             if (uuid.equals(uuidP1)) {

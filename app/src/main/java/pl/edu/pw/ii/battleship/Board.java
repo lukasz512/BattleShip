@@ -73,13 +73,6 @@ public class Board implements Serializable {
         ship.removeShip();
     }
 
-    /**
-     * Returns the place in the board with coordinates (x, y)
-     *
-     * @param x x coordinate 0-based index
-     * @param y y coordinate 0-based index
-     * @return place on the board
-     */
     Place placeAt(int x, int y) {
         if (board == null || isOutOfBounds(x, y) || board[y][x] == null) {
             return null;
@@ -88,9 +81,6 @@ public class Board implements Serializable {
         return board[y][x];
     }
 
-    /**
-     * Hits given place, returns true if was able to successfully hit the
-     */
     void hit(Place placeToHit) {
         if (placeToHit == null) {
             return;

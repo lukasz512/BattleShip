@@ -58,14 +58,14 @@ public class MainActivity extends AppCompatActivity {
     Game game = new Game();
 
     /**
-     * Creates main Player object
+     * main Player object
      */
-    Player player = new Player();
+    Player player;
 
     /**
-     * Creates Opponent player object
+     * Opponent player object
      */
-    Player opponent = new Player();
+    Player opponent;
 
     /**
      * Contains Player Board sent from server
