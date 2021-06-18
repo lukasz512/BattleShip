@@ -51,8 +51,6 @@ public class PlaceShipsActivity extends AppCompatActivity {
         playerBoard = new Board();
         boardView.setBoard(playerBoard);
         boardView.displayBoardsShips(true);
-        boardView.setBoard(playerBoard);
-        boardView.displayBoardsShips(true);
 
         ImageView minesweeper = (ImageView) findViewById(R.id.minesweeperStatus);
         ImageView frigate = (ImageView) findViewById(R.id.frigate);

@@ -48,7 +48,7 @@ class Player implements Serializable {
      * @param uuid unique identifier to point the right Player
      */
     public void setUuid(String uuid) {
-        if (uuid == null || uuid.trim().length() != 36) {
+        if (uuid == null) {
             throw new RuntimeException("UUID is not valid");
         } else {
             this.uuid = uuid;
