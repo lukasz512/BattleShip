@@ -20,6 +20,7 @@ import static pl.edu.pw.ii.battleship.MainActivity.API_URL;
 
 public class CreateUserActivity extends AppCompatActivity {
     private EditText userName;
+    private Player player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,9 +53,11 @@ public class CreateUserActivity extends AppCompatActivity {
 
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
 
+        player = new Player(name);
         JSONObject object = new JSONObject();
         try {
-            object.put("name", name);
+            object.put("name", player.getName());
+            object.put("privateToken", player.getPrivateToken());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -64,10 +67,11 @@ public class CreateUserActivity extends AppCompatActivity {
                     try {
                         // get user uuid
                         String uuid = response.getString("uuid");
+                        player.setUuid(uuid);
                         // go to another activity
                         Intent intent1 = new Intent(CreateUserActivity.this, PlaceShipsActivity.class);
                         // transfer user data to another activity
-                        intent1.putExtra("uuid", uuid);
+                        intent1.putExtra("player", player);
                         startActivity(intent1);
                     } catch (JSONException e) {
                         e.printStackTrace();

@@ -19,8 +19,7 @@ import java.io.Serializable;
 import static pl.edu.pw.ii.battleship.MainActivity.API_URL;
 
 public class MatchingPlayersActivity extends AppCompatActivity implements Serializable {
-    private Board playerBoard;
-    private String uuid;
+    private Player player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,11 +28,8 @@ public class MatchingPlayersActivity extends AppCompatActivity implements Serial
 
         //Activity entrance and exit animation
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-
+        player = (Player) getIntent().getSerializableExtra("player");
         // get user board
-        Intent i = getIntent();
-        uuid = i.getStringExtra("uuid");
-        playerBoard = (Board) getIntent().getSerializableExtra("playerBoard");
 
         // send user ships positions
         sendUserShipsPositions();
@@ -42,11 +38,13 @@ public class MatchingPlayersActivity extends AppCompatActivity implements Serial
     public void sendUserShipsPositions() {
         JSONObject object = new JSONObject();
         try {
-            object.put("board", playerBoard);
+            object.put("player-uuid", player.getUuid());
+            object.put("privateToken", player.getPrivateToken());
+            object.put("board", player.getBoard());
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        String url = API_URL + "/players/" + uuid + "/new_game";
+        String url = API_URL + "/matches/new_game";
 
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, object,
@@ -115,10 +113,6 @@ public class MatchingPlayersActivity extends AppCompatActivity implements Serial
         queue.add(stringRequest);
     }
 
-    public String handleStringConcatenation(String arrayText) {
-        return arrayText.replace("[", "").replace("]", "").replace("\"", "").replace(",", "");
-    }
-
     public void segueToMainActivity(JSONObject response) {
         try {
             Intent intent = new Intent(MatchingPlayersActivity.this, MainActivity.class);
@@ -128,27 +122,25 @@ public class MatchingPlayersActivity extends AppCompatActivity implements Serial
             JSONObject playerTwo = response.getJSONObject("playerTwo");
 
             String uuidP1 = playerOne.getString("uuid");
-            String nameP1 = playerOne.getString("name");
-            String boardP1 = response.getString("playerOneShips");
-            String b1 = handleStringConcatenation(boardP1);
-
+            System.out.println(uuidP1);
             String uuidP2 = playerTwo.getString("uuid");
-            String nameP2 = playerTwo.getString("name");
-            String boardP2 = response.getString("playerTwoShips");
-            String b2 = handleStringConcatenation(boardP2);
+            System.out.println(uuidP2);
 
-            // create players
-            Player player1 = new Player(nameP1, uuidP1, b1);
-            Player player2 = new Player(nameP2, uuidP2, b2);
 
             // save players
-            if (uuid.equals(uuidP1)) {
-                intent.putExtra("player", player1);
-                intent.putExtra("opponent", player2);
+            Player opponent;
+            if (player.getUuid().equals(uuidP1)) {
+                opponent = new Player(playerTwo.getString("name"));
+                opponent.setUuid(playerTwo.getString("uuid"));
+
             } else {
-                intent.putExtra("player", player2);
-                intent.putExtra("opponent", player1);
+                opponent = new Player(playerOne.getString("name"));
+                opponent.setUuid(playerOne.getString("uuid"));
             }
+
+            intent.putExtra("player", player);
+            intent.putExtra("opponent", opponent);
+
 
             // get game data
             String gameUuid = response.getString("uuid");

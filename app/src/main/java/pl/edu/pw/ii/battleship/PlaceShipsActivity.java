@@ -27,7 +27,7 @@ public class PlaceShipsActivity extends AppCompatActivity {
     private ShipView shipBeingDragged = null;
     private final List<ShipView> fleetView = new LinkedList<>();
     private Button placeButton;
-    private String uuid;
+    private Player player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +44,7 @@ public class PlaceShipsActivity extends AppCompatActivity {
         enablePlaceButton(false);
 
         // get player data
-        Intent intent = getIntent();
-        uuid = intent.getStringExtra("uuid");
+        player = (Player) getIntent().getSerializableExtra("player");
 
         // set the Board
         boardView = (BoardView) findViewById(R.id.placeShipsBoardView);
@@ -263,8 +262,9 @@ public class PlaceShipsActivity extends AppCompatActivity {
     }
 
     public void goToWaitingActivity(View view) {
+        player.setBoard(playerBoard.toString());
         Intent intent = new Intent(PlaceShipsActivity.this, MatchingPlayersActivity.class);
-        intent.putExtra("uuid", uuid);
+        intent.putExtra("player", player);
         intent.putExtra("playerBoard", playerBoard);
         startActivity(intent);
     }

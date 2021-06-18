@@ -1,6 +1,7 @@
 package pl.edu.pw.ii.battleship;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * Created by Lukasz Ostrowski
@@ -10,6 +11,9 @@ class Player implements Serializable {
     private String uuid;
     /** name of Player */
     private String name;
+
+    /** name of Player */
+    private UUID privateToken;
 
     /** String representation of ships placed on a Player's board */
     private String board;
@@ -30,6 +34,12 @@ class Player implements Serializable {
         setUuid(uuid);
         setName(name);
         setBoard(board);
+        this.privateToken = UUID.randomUUID();
+    }
+
+    public Player(String name) {
+        setName(name);
+        this.privateToken = UUID.randomUUID();
     }
 
     /**
@@ -112,4 +122,9 @@ class Player implements Serializable {
     public int getPoints() {
         return points;
     }
+
+    public UUID getPrivateToken() {
+        return privateToken;
+    }
+
 }
