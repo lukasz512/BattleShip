@@ -5,6 +5,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.UUID;
+
 import static org.junit.Assert.assertEquals;
 
 public class PlayerUnitTests {
@@ -14,7 +16,7 @@ public class PlayerUnitTests {
     String boardValid = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
     int pointsFromServer = 15;
 
-    String uuidInvalid = "662568f6-a6a2-4d6c-b4ae-3c0691ec033";
+    String uuidInvalid = null;
     String nameEmpty = "";
     String nameToShort = "x";
     String boardInvalid = "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
@@ -35,6 +37,20 @@ public class PlayerUnitTests {
     @Test
     public void returnCorrectName() {
         Player player = new Player(uuidValid, nameValid, boardValid);
+        String name = player.getName();
+        assertEquals(name, nameValid);
+    }
+
+    @Test
+    public void returnCorrectUUID() {
+        Player player = new Player(uuidValid, nameValid, boardValid);
+        UUID uuid = player.getPrivateToken();
+        assertEquals(uuid, uuid);
+    }
+
+    @Test
+    public void createPlayerCorrect() {
+        Player player = new Player(nameValid);
         String name = player.getName();
         assertEquals(name, nameValid);
     }
